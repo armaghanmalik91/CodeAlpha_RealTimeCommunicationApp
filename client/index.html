@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoogleMeet - Next-Gen Video Conferencing & Virtual Classrooms</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ================= APP HEADER ================= -->
+    <header class="app-header" id="app-header">
+        <div class="header-left">
+            <button class="icon-btn" id="btn-toggle-sidebar" title="Toggle Sidebar" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+            <div class="app-logo" onclick="switchSidebarTab('meetings')" style="cursor: pointer;">
+                <i class="fa-solid fa-video logo-icon"></i>
+                <span class="logo-text">GoogleMeet</span>
+            </div>
+        </div>
+        
+        <!-- Header Options Added -->
+        <nav class="header-nav">
+            <a href="javascript:void(0)" onclick="switchSidebarTab('meetings')"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="javascript:void(0)" onclick="switchSidebarTab('schedule')"><i class="fa-solid fa-calendar-days"></i> Schedule</a>
+            <a href="javascript:void(0)" onclick="switchSidebarTab('recordings')" id="nav-header-recordings"><i class="fa-solid fa-video"></i> Board Record History</a>
+            <a href="javascript:void(0)" onclick="toggleWhiteboard()"><i class="fa-solid fa-pen-ruler"></i> Whiteboard Studio</a>
+            <a href="javascript:void(0)" onclick="openLegalModal('help')"><i class="fa-solid fa-headset"></i> Support</a>
+        </nav>
+
+        <div class="header-right">
+            <span class="time-display" id="clock-display">12:00 PM</span>
+            <button class="icon-btn" id="btn-header-help" title="Help & Policies" onclick="openLegalModal('help')"><i class="fa-solid fa-circle-question"></i></button>
+            <button class="icon-btn" id="btn-header-settings" title="Settings" onclick="switchSidebarTab('settings')"><i class="fa-solid fa-gear"></i></button>
+            <div class="profile-container">
+                <div class="avatar-circle" id="user-avatar" onclick="toggleProfileDropdown()">A</div>
+                <div class="profile-dropdown hidden" id="profile-dropdown">
+                    <p class="user-name-text" id="dropdown-user-name">Armaghan Malik</p> <!--[cite: 26] -->
+                    <p class="user-email-text" id="dropdown-user-email">armaghan@Googlemeet.com</p> <!--[cite: 26] -->
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item" onclick="switchSidebarTab('settings')"><i class="fa-solid fa-user-gear"></i> Profile Settings</button>
+                    <button class="dropdown-item" onclick="openLegalModal('terms')"><i class="fa-solid fa-file-contract"></i> Terms of Service</button>
+                    <button class="dropdown-item logout-btn" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Log Out</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Mobile Backdrop -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- ================= MAIN LAYOUT & STATIC DASHBOARD ================= -->
+    <div class="main-layout" id="main-layout">
+        <aside class="sidebar" id="app-sidebar">
+            <div class="sidebar-item active" id="nav-meetings" onclick="switchSidebarTab('meetings')">
+                <i class="fa-solid fa-video"></i>
+                <span class="sidebar-label">Meetings Lobby</span>
+            </div>
+            <div class="sidebar-item" id="nav-history" onclick="switchSidebarTab('history')">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span class="sidebar-label">Call History</span>
+            </div>
+            <div class="sidebar-item" id="nav-analytics" onclick="switchSidebarTab('analytics')">
+                <i class="fa-solid fa-chart-line"></i>
+                <span class="sidebar-label">Analytics</span>
+            </div>
+            <div class="sidebar-item" id="nav-schedule" onclick="switchSidebarTab('schedule')">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span class="sidebar-label">Schedule Call</span>
+            </div>
+<div class="sidebar-item" id="nav-recordings" onclick="switchSidebarTab('recordings')">
+    <i class="fa-solid fa-video"></i>
+    <span class="sidebar-label">Board Record History</span>
+</div>
+            <div class="sidebar-item" onclick="toggleWhiteboard()">
+                <i class="fa-solid fa-pen-ruler"></i>
+                <span class="sidebar-label">Whiteboard Studio</span>
+            </div>
+            <div class="sidebar-item" id="nav-settings" onclick="switchSidebarTab('settings')">
+                <i class="fa-solid fa-gear"></i>
+                <span class="sidebar-label">Settings</span>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <!-- MEETINGS VIEW -->
+            <div class="page-view" id="dashboard-view">
+                <div class="hero-welcome">
+                    <h1>Premium Video Meetings, Now Free For Everyone.</h1>
+                    <p>Re-engineered real-time collaboration with interactive whiteboard, encrypted file transfer, and crystal clear HD video.</p>
+                </div>
+                <div class="action-row">
+                    <button class="btn-blue-pill" id="new-meeting-btn" onclick="openCreateMeetingLobby()">
+                        <i class="fa-solid fa-video"></i> New Meeting
+                    </button>
+                    <div class="join-input-group">
+                        <i class="fa-solid fa-keyboard input-icon"></i>
+                        <input type="text" id="room-code-input" name="meetingCodeInput" placeholder="Enter a code or link" autocomplete="one-time-code" value="" readonly onfocus="this.removeAttribute('readonly');">
+                        <button class="btn-join-text" id="btn-join-room" disabled onclick="joinMeetingFromInput()">Join</button>
+                    </div>
+                </div>
+                
+                <div class="divider-line"></div>
+
+                <!-- Feature Gallery Card Grid -->
+                <div class="gallery-grid">
+                    <div class="gallery-card">
+                        <img src="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?auto=format&fit=crop&w=600&q=80" alt="Virtual Classroom" class="gallery-img"> <!--[cite: 26] -->
+                        <div class="gallery-info">
+                            <h3><i class="fa-solid fa-graduation-cap"></i> Interactive Classrooms</h3>
+                            <p>Engage students with live screen share, annotations, and real-time QA chat.</p>
+                        </div>
+                    </div>
+                    <div class="gallery-card">
+                        <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80" alt="Team Sync" class="gallery-img"> <!--[cite: 26] -->
+                        <div class="gallery-info">
+                            <h3><i class="fa-solid fa-users"></i> Enterprise Team Sync</h3>
+                            <p>End-to-End encrypted WebRTC conference calls designed for high-end scalability.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider-line"></div>
+
+                <div class="carousel-card">
+                    <button class="carousel-arrow" id="carousel-prev" onclick="rotateCarousel(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div style="text-align: center;" id="carousel-content">
+                        <i class="fa-solid fa-shield-halved slide-illustration"></i>
+                        <h3 id="carousel-title">Your meeting is safe & encrypted</h3>
+                        <p id="carousel-desc" style="color: #4b5563; margin-top: 8px;">End-to-End DTLS/SRTP protection. No unauthorized participant can enter without permission.</p>
+                    </div>
+                    <button class="carousel-arrow" id="carousel-next" onclick="rotateCarousel(1)"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <!-- HISTORY VIEW -->
+             <!-- HISTORY VIEW -->
+<div class="page-view hidden" id="history-view">
+    <div class="section-header-inline" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2><i class="fa-solid fa-clock-rotate-left"></i> Call History</h2>
+        <button class="btn-secondary-sm" onclick="clearMeetingHistory()"><i class="fa-solid fa-trash"></i> Clear History</button>
+    </div>
+
+    <div id="history-list-container">
+        <!-- Meeting logs script.js se yahan dynamically insert honge -->
+    </div>
+</div>
+<!-- RECORDINGS VIEW (Board Video Recordings History) -->
+<div class="page-view hidden" id="recordings-view">
+    <div class="section-header-inline">
+        <h2><i class="fa-solid fa-video"></i> Whiteboard Video Record History</h2>
+        <button class="btn-secondary-sm" onclick="clearBoardRecordings()"><i class="fa-solid fa-trash"></i> Clear My Video History</button>
+    </div>
+    
+    <div id="host-recording-container">
+        <!-- Recorded videos script ke through render hongi -->
+    </div>
+
+    <!-- Alert badge jab participant/student login ho -->
+    <div class="empty-state-card hidden" id="non-host-recording-notice">
+        <i class="fa-solid fa-lock" style="font-size: 2.5rem; color: #b91c1c;"></i>
+        <h3>Host Access Only</h3>
+        <p>Whiteboard video session recordings are strictly visible to the session host's profile/email.</p>
+    </div>
+</div>
+
+            <!-- ANALYTICS VIEW -->
+            <div class="page-view hidden" id="analytics-view">
+                <h2><i class="fa-solid fa-chart-line"></i> Session Analytics & Performance</h2>
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <i class="fa-solid fa-wifi analytics-icon"></i>
+                        <h3>Network Latency</h3>
+                        <p class="analytics-value">12 ms <span class="badge green">Optimal</span></p>
+                    </div>
+                    <div class="analytics-card">
+                        <i class="fa-solid fa-shield-check analytics-icon"></i>
+                        <h3>Encryption Standard</h3>
+                        <p class="analytics-value">DTLS 1.2 / SRTP</p>
+                    </div>
+                    <div class="analytics-card">
+                        <i class="fa-solid fa-signal analytics-icon"></i>
+                        <h3>Bandwidth Utilization</h3>
+                        <p class="analytics-value">1.4 Mbps adaptive</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCHEDULE VIEW -->
+            <div class="page-view hidden" id="schedule-view">
+                <h2><i class="fa-solid fa-calendar-check"></i> Schedule Future Meeting</h2>
+                <div class="settings-card">
+                    <div class="setting-row">
+                        <label>Meeting Topic</label>
+                        <input type="text" id="schedule-topic" class="form-input" placeholder="e.g. Web Development Workshop">
+                    </div>
+                    <div class="setting-row">
+                        <label>Date & Time</label>
+                        <input type="datetime-local" id="schedule-datetime" class="form-input">
+                    </div>
+                    <button class="btn-blue-pill" onclick="handleScheduleMeeting()" style="margin-top:16px;">Create Scheduled Meeting</button>
+                </div>
+            </div>
+
+            <!-- RECORDINGS VIEW -->
+            <div class="page-view hidden" id="recordings-view">
+                <h2><i class="fa-solid fa-photo-film"></i> Cloud Recordings</h2>
+                <div class="empty-state-card">
+                    <i class="fa-solid fa-video-slash"></i>
+                    <p>No recorded sessions found. Local/Cloud recording features will list saved videos here.</p>
+                </div>
+            </div>
+
+            <!-- SETTINGS VIEW -->
+            <div class="page-view hidden" id="settings-view">
+                <h2><i class="fa-solid fa-gear"></i> Application & Profile Settings</h2>
+                <div class="settings-card">
+                    <h3>Media & Hardware Devices</h3>
+                    <div class="setting-row">
+                        <label><i class="fa-solid fa-microphone"></i> Microphone</label>
+                        <select id="setting-mic-select" class="form-select"></select>
+                    </div>
+                    <div class="setting-row">
+                        <label><i class="fa-solid fa-video"></i> Camera</label>
+                        <select id="setting-cam-select" class="form-select"></select>
+                    </div>
+                    <div class="setting-row flex-row">
+                        <label><i class="fa-solid fa-sliders"></i> AI Noise Suppression</label>
+                        <input type="checkbox" id="setting-noise-suppression" checked>
+                    </div>
+                    <div class="divider-line" style="margin:20px 0;"></div>
+                    <h3>User Profile</h3>
+                    <div class="setting-row">
+                        <label>Display Name</label>
+                        <input type="text" id="setting-user-name" class="form-input">
+                    </div>
+                    <button class="btn-blue-pill" onclick="saveUserSettings()" style="margin-top:16px;">Save Settings</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ================= LOBBY MODAL ================= -->
+    <div id="lobby-modal" class="modal-overlay" style="display: none;">
+    <div class="lobby-card">
+        <button class="modal-close-btn" onclick="closeLobbyModal()"><i class="fa-solid fa-xmark"></i></button>
+        <div class="lobby-header">
+            <h2>Here's your meeting code</h2>
+            <p>Copy this code or link and send it to students or colleagues you want to meet with.</p>
+        </div>
+        <div class="code-share-box">
+            <span class="generated-code" id="lobby-room-code">abc-defg-hij</span>
+            <button class="btn-copy-code" id="btn-copy-code" onclick="copyRoomCode()">
+                <i class="fa-regular fa-copy"></i> Copy Code
+            </button>
+        </div>
+        <div class="lobby-preview-container">
+            <div class="video-preview-wrapper" id="video-preview-wrapper">
+                <video id="lobby-video-preview" autoplay playsinline muted style="display: none;"></video>
+                <div class="preview-off-placeholder" id="preview-off-placeholder">
+                    <i class="fa-solid fa-video-slash" style="font-size: 1.8rem;"></i>
+                    <p>Camera is turned off</p>
+                </div>
+            </div>
+            <div class="lobby-media-controls">
+                <button class="btn-toggle-preview off" id="lobby-mic-btn" onclick="toggleLobbyMic()">
+                    <i class="fa-solid fa-microphone-slash"></i>
+                </button>
+                <button class="btn-toggle-preview off" id="lobby-cam-btn" onclick="toggleLobbyCam()">
+                    <i class="fa-solid fa-video-slash"></i>
+                </button>
+            </div>
+        </div>
+        <div class="lobby-actions">
+            <button class="btn-primary-lg block" onclick="confirmAndStartMeeting()">
+                <i class="fa-solid fa-right-to-bracket"></i> Start & Join Room Now
+            </button>
+        </div>
+    </div>
+</div>
+
+    <!-- ================= TOP NAVBAR & MEETING CONTAINER ================= -->
+    <header class="top-navbar" id="top-navbar" style="display: none;">
+        <div class="brand-logo" onclick="leaveMeeting()" style="cursor: pointer;">
+            <i class="fa-solid fa-video" style="color: #0d47a1;"></i> GoogleMeet
+        </div>
+        <div class="room-badge">
+            <span>Room: <strong id="display-room-code">abc-defg-hij</strong></span>
+            <i class="fa-regular fa-copy" onclick="copyActiveRoomCode()" title="Copy Code" style="cursor: pointer;"></i>
+        </div>
+    </header>
+
+    <main id="meeting-container" style="display: none;">
+        <div class="video-workspace" id="video-workspace">
+            <div class="video-grid" id="video-grid"></div>
+            <div class="floating-pip-video" id="draggable-pip">
+                <video id="local-video" autoplay playsinline muted></video>
+                <div class="user-tag">
+                    <i class="fa-solid fa-microphone"></i> You
+                </div>
+            </div>
+        </div>
+
+        <aside class="side-panel" id="in-call-side-panel">
+            <div class="panel-header">
+                <span>In-Call Chat</span>
+                <i class="fa-solid fa-xmark" onclick="toggleInCallSidePanel()" title="Close Panel" style="cursor: pointer;"></i>
+            </div>
+            <div class="chat-box" id="chat-messages">
+                <div class="chat-bubble">Meeting started! Welcome everyone.</div>
+            </div>
+            <div class="chat-footer">
+                <div class="input-pill">
+                    <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                    <label for="file-upload-input" class="file-btn-label" title="Attach File">
+                        <i class="fa-solid fa-paperclip"></i>
+                    </label>
+                    <input type="file" id="file-upload-input" style="display: none;" onchange="handleFileSelect(event)">
+                </div>
+                <button class="btn-send" onclick="sendChatMessage()">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </aside>
+
+        <div class="floating-controls">
+            <button class="btn-ctrl" id="btn-toggle-mic" onclick="toggleMic()" title="Toggle Mic">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+            <button class="btn-ctrl" id="btn-toggle-cam" onclick="toggleCam()" title="Toggle Camera">
+                <i class="fa-solid fa-video"></i>
+            </button>
+            <button class="btn-ctrl" id="btn-screen-share" onclick="toggleScreenShare()" title="Share Screen">
+                <i class="fa-solid fa-desktop"></i>
+            </button>
+            <button class="btn-ctrl " id="btn-whiteboard" onclick="toggleWhiteboard()" title="Interactive Whiteboard Studio">
+                <i class="fa-solid fa-pen-ruler"></i>
+            </button>
+            <button class="btn-ctrl" id="btn-toggle-chat" onclick="toggleInCallSidePanel()" title="Toggle Chat Panel">
+                <i class="fa-solid fa-message"></i>
+            </button>
+            <button class="btn-ctrl leave-btn" onclick="leaveMeeting()" title="Leave Call">
+                <i class="fa-solid fa-phone-slash"></i>
+            </button>
+        </div>
+    </main>
+
+    <!-- ================= INTERACTIVE WHITEBOARD MODAL (PREMIUM RE-ENGINEERED) ================= -->
+    <div id="whiteboard-modal" class="modal-overlay" style="display: none;">
+        <div class="whiteboard-card">
+            <div class="wb-header">
+                <h3><i class="fa-solid fa-pen-ruler"></i>  Whiteboard Studio</h3>
+                <div class="wb-toolbar">
+                    <label>Color: <input type="color" id="wb-color" value="#0d47a1"></label>
+                    <label>Size: <input type="range" id="wb-size" min="1" max="25" value="4"></label>
+                    <button class="wb-tool-btn" onclick="clearWhiteboard()"><i class="fa-solid fa-trash"></i> Clear Canvas</button>
+                    <button class="wb-tool-btn close-btn" onclick="toggleWhiteboard()"><i class="fa-solid fa-xmark"></i> Close</button>
+                </div>
+            </div>
+            <div class="wb-canvas-wrapper">
+                <canvas id="whiteboard-canvas" width="900" height="550"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= ADVANCED DYNAMIC LANDING PAGE ================= -->
+    <div class="landing-container" id="landing-page">
+        <nav class="landing-navbar">
+            <div class="nav-brand">
+                <i class="fa-solid fa-video"></i>
+                <span>GoogleMeet</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features"><i class="fa-solid fa-bolt"></i> Features</a>
+                <a href="#demo-video"><i class="fa-solid fa-circle-play"></i> Product Demo</a>
+                <a href="#live-experience"><i class="fa-solid fa-desktop"></i> Experience</a>
+                <a href="#how-it-works"><i class="fa-solid fa-route"></i> How It Works</a>
+                <a href="#tech-stack"><i class="fa-solid fa-layer-group"></i> Tech Stack</a>
+                <a href="#faq"><i class="fa-solid fa-circle-question"></i> FAQ</a>
+            </div>
+            <div class="nav-auth-group">
+                <button class="nav-btn-link" onclick="openAuthModal('login')">Log In</button>
+                <button class="nav-btn-accent" onclick="openAuthModal('signup')">Sign Up Free</button>
+            </div>
+        </nav>
+
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="badge-pill">
+                    <span class="status-dot green"></span> Ultra Low-Latency WebRTC 2.0
+                </div>
+                <h1 class="hero-title">Virtual Classrooms & Seamless Meetings for Everyone</h1>
+                <p class="hero-subtitle">Connect, teach, and collaborate in real-time with crystal-clear 1080p HD video, interactive whiteboard canvas, and instant peer-to-peer file sharing.</p>
+                <div class="hero-action-card">
+                    <div class="action-buttons-group">
+                        <button class="btn-primary-hero" onclick="openAuthModal('signup')">
+                            <i class="fa-solid fa-video"></i> Start Meeting Free
+                        </button>
+                        <button class="btn-secondary-hero" onclick="openAuthModal('login')">
+                            <i class="fa-solid fa-graduation-cap"></i> Join Classroom
+                        </button>
+                    </div>
+                    <div class="quick-join-wrapper">
+                        <div class="input-join-group">
+                            <i class="fa-solid fa-keyboard"></i>
+                            <input type="text" id="landing-join-input" placeholder="Enter Meeting Room Code (e.g. abc-defg-hij)">
+                            <button class="btn-text-join" onclick="joinMeetingFromLanding()">Join Room</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-trust-badge">
+                    <div class="avatars-stack">
+                        <span class="avatar-sm">AM</span>
+                        <span class="avatar-sm alt1">JD</span>
+                        <span class="avatar-sm alt2">SK</span>
+                        <span class="avatar-sm alt3">+12</span>
+                    </div>
+                    <p><span>Active Now:</span> 1,250+ students & educators collaborating live</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Demo Section -->
+<section class="landing-section alt-bg" id="demo-video">
+    <div class="section-header">
+        <h2>See GoogleMeet in Action</h2>
+        <p>Watch how easy it is to start video meetings, share screens, and draw live on the canvas.</p>
+    </div>
+    <div class="video-preview-card">
+        <div class="responsive-video-wrapper">
+            <iframe 
+                src="https://www.youtube.com/embed/hOWGF4Nf2Xw?autoplay=1&mute=1&loop=1&playlist=hOWGF4Nf2Xw" 
+                title="GoogleMeet Walkthrough" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+</section>
+
+        <!-- Dynamic Image Banner Showcase Section -->
+        <section class="landing-section">
+            <div class="section-header">
+                <h2>Designed for Modern Remote Teams</h2>
+                <p>High quality conferencing experience tailored for all devices and environments.</p>
+            </div>
+            <div class="banner-showcase-grid">
+                <div class="banner-card">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80" alt="Remote Work" class="banner-img"> <!--[cite: 26] -->
+                    <div class="banner-overlay">
+                        <h4>Ultra Low Latency</h4>
+                        <p>Streamlined WebRTC peer architecture.</p>
+                    </div>
+                </div>
+                <div class="banner-card">
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Team Collaboration" class="banner-img"> <!--[cite: 26] -->
+                    <div class="banner-overlay">
+                        <h4>Whiteboard & File Sharing</h4>
+                        <p>Brainstorming canvas built right in.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="landing-section" id="features">
+            <div class="section-header">
+                <h2>Built for High-Performance Collaboration</h2>
+                <p>Everything you need for seamless digital learning and professional team syncs.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                    <h3>Encrypted Peer-to-Peer</h3>
+                    <p>DTLS and SRTP encryption guarantee that your video feeds and data stay private between participants.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-pen-ruler"></i></div>
+                    <h3>Interactive Whiteboard</h3>
+                    <p>Draw diagrams, solve math problems live, and brainstorm ideas in real-time with an integrated canvas.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-desktop"></i></div>
+                    <h3>HD Screen Sharing</h3>
+                    <p>Present slides, code editors, or documents smoothly with low-bandwidth adaptation technology.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-file-arrow-up"></i></div>
+                    <h3>Instant File Transfer</h3>
+                    <p>Share notes, code snippets, and assignment PDFs directly through the built-in in-call chat panel.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="landing-section alt-bg" id="live-experience">
+            <div class="section-header">
+                <h2>Designed for Virtual Classrooms & Teams</h2>
+                <p>A modern floating video workspace with customizable controls and PIP views.</p>
+            </div>
+            <div class="experience-showcase">
+                <div class="showcase-box">
+                    <i class="fa-solid fa-display showcase-icon"></i>
+                    <h3>Responsive Dynamic Grid</h3>
+                    <p>Automatically scales and arranges participant video streams based on screen size and dynamic peer count.</p>
+                </div>
+                <div class="showcase-box">
+                    <i class="fa-solid fa-up-down-left-right showcase-icon"></i>
+                    <h3>Draggable Local Preview</h3>
+                    <p>Keep track of your camera view anywhere on screen with a draggable Picture-in-Picture window.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="landing-section" id="how-it-works">
+            <div class="section-header">
+                <h2>How It Works</h2>
+                <p>Start your meeting in three simple steps.</p>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-num">1</div>
+                    <h3>Create Room Code</h3>
+                    <p>Generate a secure meeting code instantly with one click from your dashboard.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">2</div>
+                    <h3>Share Link or Code</h3>
+                    <p>Send the unique room link to your students, team, or participants.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-num">3</div>
+                    <h3>Collaborate Live</h3>
+                    <p>Enjoy HD video, live chat, interactive whiteboard, and screen sharing.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="landing-section alt-bg" id="tech-stack">
+            <div class="section-header">
+                <h2>Powered by Cutting-Edge Tech</h2>
+                <p>Engineered with modern WebRTC signaling and real-time WebSockets.</p>
+            </div>
+            <div class="tech-pills">
+                <span class="tech-pill"><i class="fa-brands fa-js" style="color:#d97706;"></i> WebRTC API</span>
+                <span class="tech-pill"><i class="fa-solid fa-network-wired" style="color:#2563eb;"></i> Socket.io Signaling</span>
+                <span class="tech-pill"><i class="fa-brands fa-node-js" style="color:#16a34a;"></i> Node.js & Express</span>
+                <span class="tech-pill"><i class="fa-solid fa-paint-brush" style="color:#dc2626;"></i> HTML5 Canvas</span>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="landing-section" id="faq">
+            <div class="section-header">
+                <h2>Frequently Asked Questions</h2>
+                <p>Everything you need to know about joining, hosting, and security on GoogleMeet.</p>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item">
+                    <h4>Do participants need an account to join?</h4>
+                    <p>No, participants can join directly by entering the room code shared by the host.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Is GoogleMeet free to use?</h4>
+                    <p>Yes, GoogleMeet provides free HD video conferencing and interactive virtual classrooms.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>How many participants can join a meeting room?</h4>
+                    <p>GoogleMeet supports seamless multi-peer connections designed for classrooms, group discussions, and team syncs.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Are my calls and file transfers secure?</h4>
+                    <p>Yes, media feeds and file transfers use DTLS/SRTP end-to-end peer encryption with WebRTC technology.</p>
+                </div>
+                <div class="faq-item">
+                    <h4>Can I share my screen and write on a whiteboard simultaneously?</h4>
+                    <p>Yes, you can toggle screen sharing and open the collaborative canvas drawing board at any point during your call.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Long Footer -->
+        <footer class="landing-footer">
+            <div class="footer-grid">
+                <div class="footer-col brand-col">
+                    <div class="footer-brand">
+                        <i class="fa-solid fa-video"></i> GoogleMeet
+                    </div>
+                    <p>The enterprise-grade open collaboration platform designed for modern virtual classrooms, interactive webinars, and peer-to-peer web syncs.</p>
+                    <div class="social-icons">
+                        <a href="https://twitter.com" target="_blank" rel="noopener"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="https://linkedin.com" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="https://github.com" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i></a>
+                        <a href="https://discord.com" target="_blank" rel="noopener"><i class="fa-brands fa-discord"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Product Features</h4>
+                    <ul>
+                        <li><a href="#features">HD Video Calling</a></li>
+                        <li><a href="#features">Screen Sharing</a></li>
+                        <li><a href="#features">Interactive Whiteboard</a></li>
+                        <li><a href="#features">Encrypted File Transfer</a></li>
+                        <li><a href="#features">Peer-to-Peer Chat</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal & Security</h4>
+                    <ul>
+                        <li><a href="javascript:void(0)" onclick="openLegalModal('terms')">Terms of Service</a></li>
+                        <li><a href="javascript:void(0)" onclick="openLegalModal('privacy')">Privacy Policy</a></li>
+                        <li><a href="javascript:void(0)" onclick="openLegalModal('help')">Help Center & FAQ</a></li>
+                        <li><a href="#tech-stack">Security Specs</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Platform Security</h4>
+                    <div class="security-badge">
+                        <i class="fa-solid fa-lock green-icon"></i> End-To-End Encrypted DTLS/SRTP Media Streams
+                    </div>
+                    <p class="security-text">No recording or data harvesting. Your private communications remain strictly your own.</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 GoogleMeet Inc. All rights reserved. Designed for high performance WebRTC real-time syncs.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ================= LEGAL & POLICIES MODAL ================= -->
+    <!-- ENHANCED LEGAL & HELP MODAL -->
+<div id="legal-modal" class="modal-overlay" style="display: none;">
+    <div class="lobby-card modal-large legal-modal-card">
+        <!-- Modal Header -->
+        <div class="modal-header-styled">
+            <div class="modal-title-group">
+                <div class="modal-icon-badge">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h2>GoogleMeet Legal & Support Center</h2>
+                    <p class="subtitle-sm">Terms, Privacy Commitments, and Platform Guides</p>
+                </div>
+            </div>
+            <button class="modal-close-btn" onclick="closeLegalModal()" title="Close Modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="auth-tabs legal-tabs-wrapper">
+            <button class="tab-btn active" id="tab-legal-terms" onclick="switchLegalTab('terms')">
+                <i class="fa-solid fa-file-contract"></i> Terms of Service
+            </button>
+            <button class="tab-btn" id="tab-legal-privacy" onclick="switchLegalTab('privacy')">
+                <i class="fa-solid fa-user-shield"></i> Privacy Policy
+            </button>
+            <button class="tab-btn" id="tab-legal-help" onclick="switchLegalTab('help')">
+                <i class="fa-solid fa-circle-question"></i> Help & FAQ
+            </button>
+        </div>
+        
+        <!-- Tab 1: Terms of Service -->
+        <div class="legal-content-body" id="legal-terms-content">
+            <div class="legal-intro-banner">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>By using GoogleMeet video conferencing, you agree to comply with our community usage standards.</span>
+            </div>
+
+            <div class="legal-card-grid">
+                <div class="legal-feature-card">
+                    <div class="card-icon-wrapper blue">
+                        <i class="fa-solid fa-handshake"></i>
+                    </div>
+                    <div class="card-details">
+                        <h4>Acceptable Use Policy</h4>
+                        <p>Users must not utilize the platform for unauthorized broadcasting, illegal streaming, harassment, or malicious activity.</p>
+                    </div>
+                </div>
+
+                <div class="legal-feature-card">
+                    <div class="card-icon-wrapper green">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <div class="card-details">
+                        <h4>Account & Room Security</h4>
+                        <p>You are strictly responsible for preserving the confidentiality of your host keys, passcodes, and instant room codes.</p>
+                    </div>
+                </div>
+
+                <div class="legal-feature-card">
+                    <div class="card-icon-wrapper purple">
+                        <i class="fa-solid fa-server"></i>
+                    </div>
+                    <div class="card-details">
+                        <h4>Service Level (SLA)</h4>
+                        <p>GoogleMeet strives for 99.9% uptime infrastructure. Mesh video streams operate on a peer-to-peer basis "AS IS".</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Privacy Policy -->
+        <div class="legal-content-body hidden" id="legal-privacy-content">
+            <div class="legal-intro-banner privacy">
+                <i class="fa-solid fa-lock"></i>
+                <span>Your communications are protected with WebRTC privacy-first end-to-end security protocol.</span>
+            </div>
+
+            <div class="privacy-highlights-list">
+                <div class="privacy-item">
+                    <i class="fa-solid fa-database"></i>
+                    <div>
+                        <strong>Zero Data Harvesting</strong>
+                        <p>We do not store, inspect, or monetize your video frames, microphone audio, or whiteboard session streams.</p>
+                    </div>
+                </div>
+                <div class="privacy-item">
+                    <i class="fa-solid fa-shield-virus"></i>
+                    <div>
+                        <strong>End-to-End Encryption</strong>
+                        <p>All real-time audio/video peer connections use mandatory DTLS and SRTP browser encryption standards.</p>
+                    </div>
+                </div>
+                <div class="privacy-item">
+                    <i class="fa-solid fa-hard-drive"></i>
+                    <div>
+                        <strong>Browser-Local Logs</strong>
+                        <p>Call history and whiteboard recordings remain on your local device browser storage and can be wiped instantly.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Help & FAQ -->
+        <div class="legal-content-body hidden" id="legal-help-content">
+            <div class="faq-list-styled">
+                <div class="faq-card">
+                    <div class="faq-badge">01</div>
+                    <div>
+                        <h4>How do I launch or join a instant call?</h4>
+                        <p>Click <strong>New Meeting</strong> on your dashboard, copy the generated room code, share it with your audience, and click <strong>Start & Join Room</strong>.</p>
+                    </div>
+                </div>
+
+                <div class="faq-card">
+                    <div class="faq-badge">02</div>
+                    <div>
+                        <h4>How to record Whiteboard sessions?</h4>
+                        <p>Open <strong>Whiteboard Studio</strong> during a call. Your board interactions automatically compile into video recordings visible under your host profile history.</p>
+                    </div>
+                </div>
+
+                <div class="faq-card">
+                    <div class="faq-badge">03</div>
+                    <div>
+                        <h4>Who can access saved recordings?</h4>
+                        <p>Board video recordings are protected and mapped directly to the logged-in Host email account for privacy.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- ================= AUTHENTICATION MODAL ================= -->
+    <div id="auth-modal" class="modal-overlay" style="display: none;">
+        <div class="auth-card">
+            <button class="modal-close-btn" onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="auth-tabs">
+                <button class="tab-btn active" id="tab-login" onclick="switchAuthTab('login')">Log In</button>
+                <button class="tab-btn" id="tab-signup" onclick="switchAuthTab('signup')">Sign Up</button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form id="login-form" class="auth-form" autocomplete="off" onsubmit="handleLogin(event)">
+    <h3>Welcome Back</h3>
+    <p class="auth-subtitle">Log in to host or join classes</p>
+    <div class="input-group">
+        <i class="fa-solid fa-envelope"></i>
+        <input type="email" id="login-email" autocomplete="off" placeholder="Email Address" required>
+    </div>
+    <div class="input-group">
+        <i class="fa-solid fa-lock"></i>
+        <input type="password" id="login-password" autocomplete="new-password" placeholder="Password" required>
+        <i class="fa-solid fa-eye eye-toggle" onclick="togglePasswordVisibility('login-password', this)"></i>
+    </div>
+
+    <div class="forgot-password-wrapper">
+        <a href="javascript:void(0)" class="forgot-pass-link" onclick="openForgotHintModal()">Forgot Password?</a>
+    </div>
+
+    <button type="submit" class="btn-primary-block" style="margin-top: 10px;">Log In to GoogleMeet</button>
+</form>
+
+            <!-- CREATE ACCOUNT (SIGNUP) FORM -->
+            <form id="signup-form" class="auth-form" style="display: none;" onsubmit="handleSignup(event)">
+                <h3>Create Account</h3>
+                <p class="auth-subtitle">Sign up as Student or Teacher</p>
+
+                <button type="button" class="btn-google-auth" onclick="handleGoogleAuth()">
+                    <i class="fa-brands fa-google"></i> Continue with Google
+                </button>
+
+                <div class="auth-divider">
+                    <span>or register with email</span>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="signup-firstname" placeholder="First Name" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="signup-lastname" placeholder="Last Name" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" id="signup-email" placeholder="Email Address" required>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="signup-password" placeholder="Password" required>
+                    <i class="fa-solid fa-eye eye-toggle" onclick="togglePasswordVisibility('signup-password', this)"></i>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="signup-confirm-password" placeholder="Confirm Password" required>
+                    <i class="fa-solid fa-eye eye-toggle" onclick="togglePasswordVisibility('signup-confirm-password', this)"></i>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="terms-checkbox" required>
+                    <label for="terms-checkbox">I agree to the <a href="javascript:void(0)" onclick="openLegalModal('terms')">Terms of Service</a> & <a href="javascript:void(0)" onclick="openLegalModal('privacy')">Privacy Policy</a></label>
+                </div>
+
+                <button type="submit" class="btn-primary-block">Register Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FORGOT PASSWORD MODALS -->
+    <div id="forgot-hint-modal" class="modal-overlay" style="display: none;">
+        <div class="auth-card">
+            <button class="modal-close-btn" onclick="closeForgotHintModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="auth-form">
+                <h3>Admin Security Check</h3>
+                <p class="auth-subtitle">Please enter the admin security hint code to reset your password.</p>
+                <div class="input-group">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <input type="text" id="admin-hint-input" placeholder="Enter Security Hint (e.g. 051)" required>
+                </div>
+                <button type="button" class="btn-primary-block" onclick="verifyAdminHint()">Verify Hint Code</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="forgot-code-modal" class="modal-overlay" style="display: none;">
+        <div class="auth-card">
+            <button class="modal-close-btn" onclick="closeForgotCodeModal()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="auth-form">
+                <h3>Reset Password</h3>
+                <p class="auth-subtitle">Verification code generated successfully!</p>
+                
+                <div class="code-popup-display">
+                    <span class="code-label">Your Verification Code:</span>
+                    <h2 id="generated-reset-code">123456</h2>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" id="reset-email" placeholder="Enter Your Registered Email" required>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-key"></i>
+                    <input type="text" id="reset-code-input" placeholder="Enter Verification Code" required>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="reset-new-password" placeholder="Enter New Password" required>
+                    <i class="fa-solid fa-eye eye-toggle" onclick="togglePasswordVisibility('reset-new-password', this)"></i>
+                </div>
+
+                <button type="button" class="btn-primary-block" onclick="submitPasswordReset()">Change Password</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Draggable Script for Local Video Preview -->
+    <script>
+        const dragItem = document.getElementById("draggable-pip");
+        let active = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+        if (dragItem) {
+            dragItem.addEventListener("mousedown", dragStart, false);
+            document.addEventListener("mouseup", dragEnd, false);
+            document.addEventListener("mousemove", drag, false);
+
+            dragItem.addEventListener("touchstart", dragStart, {passive: false});
+            document.addEventListener("touchend", dragEnd, false);
+            document.addEventListener("touchmove", drag, {passive: false});
+        }
+
+        function dragStart(e) {
+            let clientX = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
+            let clientY = e.type === "touchstart" ? e.touches[0].clientY : e.clientY;
+            initialX = clientX - xOffset; initialY = clientY - yOffset;
+            if (e.target === dragItem || dragItem.contains(e.target)) active = true;
+        }
+
+        function dragEnd() { initialX = currentX; initialY = currentY; active = false; }
+
+        function drag(e) {
+            if (active) {
+                e.preventDefault();
+                let clientX = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
+                let clientY = e.type === "touchmove" ? e.touches[0].clientY : e.clientY;
+                currentX = clientX - initialX; currentY = clientY - initialY;
+                xOffset = currentX; yOffset = currentY;
+                dragItem.style.transform = "translate3d(" + currentX + "px, " + currentY + "px, 0)";
+            }
+        }
+    </script>
+
+    <!-- Core Scripts -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
