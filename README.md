@@ -1,4 +1,4 @@
-# Real-Time Communication App
+# Real-Time Communication Website for Online Meetings
 
 A modern real-time communication platform designed to provide seamless
 virtual meetings, video communication, meeting management, and
