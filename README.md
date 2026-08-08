@@ -6,7 +6,7 @@ collaborative interaction through a clean and user-friendly interface.
 
 ------------------------------------------------------------------------
 
-## 📸 System Walkthrough & Application Interfaces
+## System Walkthrough & Application Interfaces
 
 ### 🌐 Public Landing & Authentication
 
